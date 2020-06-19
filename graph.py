@@ -9,33 +9,14 @@ class Vertex:
         self.color = 'white'
 
         self.dist = 0  # 距离参数
-        self.pred = None
-        self.disc = 0
-        self.fin = 0
-    
-    def __str__(self):
-        return str(self.name) + ":color " + self.color + ":disc " + \
-               str(self.disc) + ":fin " + str(self.fin) + ":dist " + \
-               str(self.dist) + ":pred \n\t[" + str(self.pred)+ "]\n"
 
-    # def __lt__(self,o):
-    #     return self.name < o.id
     def addNeighbor(self, nbr, edge, movie_id: str):
         '''
         以演员作为key来存储共同出演的movie列表。
         '''
         self.connectedTo[nbr] = edge
-        self.addParticipateMovie(movie_id)
-        
-    def addParticipateMovie(self, movie_id: str):
-        '''
-        将该电影加入参演过的电影列表中
-        '''
         if movie_id not in self.movieList:
             self.movieList.append(movie_id)
-            
-    def isAlone(self):
-        return not self.connectedTo
         
     def isConnectedTo(self, nbr):
         '''
@@ -48,24 +29,6 @@ class Vertex:
         
     def setDistance(self, d):
         self.dist = d
-
-    def setPred(self, p):
-        self.pred = p
-
-    def setDiscovery(self, dtime):
-        self.disc = dtime
-        
-    def setFinish(self, ftime):
-        self.fin = ftime
-    
-    def getFinish(self):
-        return self.fin
-        
-    def getDiscovery(self):
-        return self.disc
-        
-    def getPred(self):
-        return self.pred
         
     def getDistance(self):
         return self.dist
@@ -131,12 +94,6 @@ class Graph:
     def __contains__(self, n):
         return n in self.vertices
         
-    def addVertex(self, key):
-        self.numVertices = self.numVertices + 1
-        newVertex = Vertex(key)
-        self.vertices[key] = newVertex
-        return newVertex
-    
     def addData(self, item: dict):
         '''
         向Graph中添加json文件中读入的字典数据
@@ -153,10 +110,20 @@ class Graph:
         self.movies[movie_id]["film_page"] = item["film_page"]
         
         actors = list(item["actor"].split(","))
-        for actorA in actors:
-            for actorB in actors:
-                if actorA != actorB:
-                    self.addEdge(actorA, actorB, movie_id) # 添加A和B之间的连结
+        if actors != [""]:
+            if len(actors) >= 2:
+                for actorA in actors:
+                    for actorB in actors:
+                        if actorA != actorB:
+                            self.addEdge(actorA, actorB, movie_id)  # 添加A和B之间的连结
+            else:  # 只有一个演员，就自己跟自己连通
+                actor = actors[0]
+                if actor not in self.vertices:
+                    self.addVertex(actor)
+                edge = Edge()
+                edge.addCoMovie(movie_id)
+                self.vertices[actor].addNeighbor(self.vertices[actor],
+                                                 edge, movie_id)
     
     def addEdge(self, actorA: str, actorB: str, movie_id: str):
         '''
@@ -176,6 +143,12 @@ class Graph:
                                           self.coMovies[co_actors], movie_id)
         self.vertices[actorB].addNeighbor(self.vertices[actorA],
                                           self.coMovies[co_actors], movie_id)
+        
+    def addVertex(self, key):
+        self.numVertices = self.numVertices + 1
+        newVertex = Vertex(key)
+        self.vertices[key] = newVertex
+        return newVertex
         
     def getActor(self, name):
         '''
@@ -200,7 +173,7 @@ class Graph:
     
     def getCoMovieNames(self, actorA: str, actorB: str):
         '''
-        获得两人参演的所有电影名
+        获得两人共同参演的所有电影名
         :return: str array
         '''
         co_actors = (min(actorA, actorB), max(actorA, actorB))
@@ -218,7 +191,7 @@ class Graph:
         n = len(movieList)
         return sum(map(lambda x: self.movies[x]["star"], movieList)) / n
 
-    def getMovieTypesRank(self, actors):
+    def getMovieTypesRank(self, actors: list):
         '''
         给出这些演员参演的所有电影类型的排名及其出现次数
         :param actor: str array / str
