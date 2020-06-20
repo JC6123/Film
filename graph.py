@@ -8,7 +8,8 @@ class Vertex:
         self.movieList = []  # 参演电影列表
         self.color = 'white'
 
-        self.dist = 0  # 距离参数
+        self.dist = -1  # 距离参数
+        self.pred = None
 
     def addNeighbor(self, nbr, edge, movie_id: str):
         '''
@@ -30,11 +31,17 @@ class Vertex:
     def setDistance(self, d):
         self.dist = d
         
+    def setPred(self, p):
+        self.pred = p
+        
     def getDistance(self):
         return self.dist
         
     def getColor(self):
         return self.color
+    
+    def getPred(self):
+        return self.pred
     
     def getName(self):
         '''
@@ -189,7 +196,8 @@ class Graph:
         '''
         movieList = self.getTheirMovieIDs(actors)
         n = len(movieList)
-        return sum(map(lambda x: self.movies[x]["star"], movieList)) / n
+        return round(
+            sum(map(lambda x: self.movies[x]["star"], movieList)) / n, 2)
 
     def getMovieTypesRank(self, actors: list):
         '''

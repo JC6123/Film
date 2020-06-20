@@ -34,9 +34,21 @@
 
 ## Q2
 
+连通分支的直径也可以用BFS算法来实现。调用了`calDistance`函数用来计算每个连通分支中的任意路径中的最大值。而辅助函数`bfsDist`则是用于计算以某位演员为起点的连通分支的路径长度。注意每调用一次`bfsDist`之后，要将该连通分支中的所有`Vertex`的`dist`属性重置为-1。
+
+主进程如下：
+
+![image-20200620113424897](C:\Users\17000\AppData\Roaming\Typora\typora-user-images\image-20200620113424897.png)
+
+![image-20200620113407183](C:\Users\17000\AppData\Roaming\Typora\typora-user-images\image-20200620113407183.png)
+
 ## Q3
 
-得到所有连通分支后，
+在Q1和Q2中得到所有连通分支后，利用`matplotlib.pyplot`中的工具可以将连通分支规模、直径大小、以及电影平均星级计算出来。其中计算平均星级时调用了`Graph`中的`getAverageStar`方法。
+
+![Num](E:\Git\Film\Num.png)
+
+![Diameter](E:\Git\Film\Diameter.png)
 
 ## Q4~Q5
 
@@ -44,7 +56,7 @@
 
 ![image-20200619134457746](C:\Users\17000\AppData\Roaming\Typora\typora-user-images\image-20200619134457746.png)
 
-![image-20200619134605808](C:\Users\17000\AppData\Roaming\Typora\typora-user-images\image-20200619134605808.png)
+![image-20200620114223040](C:\Users\17000\AppData\Roaming\Typora\typora-user-images\image-20200620114223040.png)
 
 ## Q6
 
