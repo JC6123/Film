@@ -1,5 +1,4 @@
 import json
-import copy
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
 from graph import *
@@ -13,16 +12,16 @@ import threading
 threading.stack_size(2 ** 27)  # 把线程的栈空间提上去
 
 
-def bfs(g: Graph):
+def bfsBranches(g: Graph):
     branches = []
     for vertex in g.getActorList():
         if vertex.getColor() == 'white':
-            branches.append(_bfs(vertex, []))
+            branches.append(_bfsBranches(vertex, []))
         
     return branches
 
 
-def _bfs(actor: Vertex, branch: list):
+def _bfsBranches(actor: Vertex, branch: list):
     temp = []
     
     if actor.getColor() == 'white':
@@ -37,7 +36,7 @@ def _bfs(actor: Vertex, branch: list):
             temp.append(co_actor)
     
     for temp_actor in temp:
-        _bfs(temp_actor, branch)
+        _bfsBranches(temp_actor, branch)
         
     return branch
 
@@ -76,7 +75,7 @@ def myProg1():
     for item in data:
         G.addData(item)
         
-    branches = bfs(G)
+    branches = bfsBranches(G)
     branches.sort(key=lambda x: (len(x), x), reverse=True)
     
     print("总连通分支数")
@@ -104,7 +103,7 @@ def myProg2():
     for item in data:
         G.addData(item)
     
-    branches = bfs(G)
+    branches = bfsBranches(G)
     branches.sort(key=lambda x: (len(x), x), reverse=True)
     
     print("前20个连通分支直径")
@@ -123,7 +122,7 @@ def myProg3():
     for item in data:
         G.addData(item)
     
-    branches = bfs(G)
+    branches = bfsBranches(G)
     branches.sort(key=lambda x: (len(x), x), reverse=True)
 
     def autolabel(rects):
@@ -133,7 +132,6 @@ def myProg3():
                      '%s' % float(height))
 
     name_list = list(range(1, 21)) + list(range(len(branches)-19, len(branches)+1))
-    '''
     num_list = list(map(lambda x: len(x), branches[0:20] + branches[-21:-1]))
     plt.figure(1)
     autolabel(plt.bar(range(len(num_list)), num_list, color='b',
@@ -145,7 +143,7 @@ def myProg3():
     fig = plt.gcf()
     fig.set_size_inches(16, 9)
     fig.savefig('Num.png', dpi=100)
-    '''
+
     plt.figure(2)
     num_list = list(map(lambda x: G.getAverageStar(x),
                         branches[0:20] + branches[-21:-1]))
@@ -198,10 +196,12 @@ def myProg6():
     data = json.load(f)
     for item in data:
         G.addData(item)
+        
+    G.getTheirRelations("周星驰", "汤姆·克鲁斯")
     
         
 # 把程序主要功能定义为一个函数
 # 开一个线程来执行这个函数，这样就拥有设定的栈空间
-t = threading.Thread(target=myProg3)
+t = threading.Thread(target=myProg1)
 t.start()  # 启动线程
 t.join()  # 进程等待线程结束
